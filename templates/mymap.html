@@ -1,10 +1,18 @@
-<center><h1> Mapa con las Localizaciones</h1></center>
-<center><h3> Palabra a buscar: Cadiz</h3></center>
+<center><h1> Mapa SD</h1></center>
+<center><h2>Busqueda: {{busqueda}}</h2></center>
 <html>
 <head>
    {{mymap.js}}
 </head>
 <body>
-<center><div width=600, height=600>{{mymap.html}}</div></center>
+	<div class="search">
+    	<div class="group"> 
+			<form action="/buscar" method="POST"><center>
+		   		<input type="text" name="text">
+		        <input type="submit" value="Buscar">
+		    </form></center>
+		</div>
+	</div>
+<center><div width=800, height=800>{{mymap.html}}</div></center>
 </body>
 </html>

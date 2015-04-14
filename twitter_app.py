@@ -14,6 +14,7 @@
 from flask import Flask, render_template
 from flask.ext.googlemaps import GoogleMaps
 from flask.ext.googlemaps import Map
+from flask import request
 
 import twitter
 
@@ -29,20 +30,24 @@ OAUTH_TOKEN_SECRET = 'SYyMRKEnI9Fy928tvmkG1NzhsXLBmpYh1sAjS3NV2iKME'
 auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
 
 twitter_api = twitter.Twitter(auth=auth)
-
 #Almacenos los tweets que tengan estas caracteristicas
-search_results = twitter_api.search.tweets(q='Cadiz',geocode='40.45,-3.75,1000km')
 
-for result in search_results["statuses"]:
-    if result["geo"]:
-        x=result["geo"]["coordinates"][0]
-        y=result["geo"]["coordinates"][1]
-        pair=[x,y]
-        coordenadas.append(pair)
+
 
 #Creamos el Mapa con los valores que queramos
-@app.route("/")
+@app.route("/buscar", methods=['POST'])
 def mapview():
+    termino = request.form['text']
+
+    search_results = twitter_api.search.tweets(q=termino,geocode='40.45,-3.75,1000km')
+    coordenadas = []
+    for result in search_results["statuses"]:
+        if result["geo"]:
+            x=result["geo"]["coordinates"][0]
+            y=result["geo"]["coordinates"][1]
+            pair=[x,y]
+            coordenadas.append(pair)
+
     mymap = Map(
         identifier="view-side",
         lat=40.45,
@@ -51,7 +56,11 @@ def mapview():
         style="height:600px;width:600px;margin:0", 
         zoom=4
     )
-    return render_template('mymap.html', mymap=mymap)
+    return render_template('mymap.html', mymap=mymap, busqueda=termino)
+
+@app.route("/")
+def index():
+    return render_template('index.html')
 
 #Ejecutamos la App
 if __name__ == "__main__":
